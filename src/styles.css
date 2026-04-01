@@ -1,1 +1,114 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+@plugin "daisyui";
+
+/*
+ * Tooltip overflow fix — overrides DaisyUI .tooltip so it escapes overflow-hidden.
+ *
+ * Direction config is defined once via custom properties on .tooltip / .tooltip-*.
+ * Both @supports branches consume the same variables — no per-direction duplication.
+ *
+ * Modern browsers (CSS Anchor Positioning): pure CSS, no JS.
+ * Fallback (Safari / older Firefox):        directive sets --tt-x / --tt-y.
+ */
+
+/* ── Direction config (shared by both branches) ── */
+
+.tooltip {
+  /* anchor positioning */
+  --_area: block-start center;
+  --_gap: 0 0 0.5rem 0;
+  --_arrow-gap: 0 0 calc(0.25rem + 1px) 0;
+  --_arrow-rot: 0deg;
+  /* fallback transforms */
+  --_tx: -50%;
+  --_ty: calc(-100% - 0.5rem + var(--tt-pos, 0.25rem));
+  --_atx: -50%;
+  --_aty: calc(-100% - 0.25rem - 1px + var(--tt-pos, 0.25rem));
+}
+
+.tooltip-bottom {
+  --_area: block-end center;
+  --_gap: 0.5rem 0 0 0;
+  --_arrow-gap: calc(0.25rem + 1px) 0 0 0;
+  --_arrow-rot: 180deg;
+  --_ty: calc(0.5rem + var(--tt-pos, -0.25rem));
+  --_aty: calc(0.25rem + 1px + var(--tt-pos, -0.25rem));
+}
+
+.tooltip-left {
+  --_area: center inline-start;
+  --_gap: 0 0.5rem 0 0;
+  --_arrow-gap: 0 calc(0.25rem + 1px) 0 0;
+  --_arrow-rot: -90deg;
+  --_tx: calc(-100% - 0.75rem + var(--tt-pos, 0.25rem));
+  --_ty: -50%;
+  --_atx: calc(-100% - 0.25rem - 1px + var(--tt-pos, 0.25rem));
+  --_aty: -50%;
+}
+
+.tooltip-right {
+  --_area: center inline-end;
+  --_gap: 0 0 0 0.5rem;
+  --_arrow-gap: 0 0 0 calc(0.25rem + 1px);
+  --_arrow-rot: 90deg;
+  --_tx: calc(0.75rem + var(--tt-pos, -0.25rem));
+  --_ty: -50%;
+  --_atx: calc(0.25rem + 1px + var(--tt-pos, -0.25rem));
+  --_aty: -50%;
+}
+
+/* ── Modern: CSS Anchor Positioning ── */
+
+@supports (anchor-name: --tt) {
+  .tooltip {
+    anchor-scope: --tt;
+  }
+
+  .tooltip > :last-child {
+    anchor-name: --tt;
+  }
+
+  .tooltip > .tooltip-content,
+  .tooltip[data-tip]::before {
+    position: fixed !important;
+    position-anchor: --tt;
+    position-area: var(--_area);
+    inset: unset !important;
+    transform: none !important;
+    margin: var(--_gap);
+    z-index: 9999;
+  }
+
+  .tooltip::after {
+    position: fixed !important;
+    position-anchor: --tt;
+    position-area: var(--_area);
+    inset: unset !important;
+    transform: rotate(var(--_arrow-rot)) !important;
+    margin: var(--_arrow-gap);
+    z-index: 9999;
+  }
+}
+
+/* ── Fallback: positioned via JS custom properties ── */
+
+@supports not (anchor-name: --tt) {
+  .tooltip > .tooltip-content,
+  .tooltip[data-tip]::before {
+    position: fixed !important;
+    inset: unset !important;
+    left: var(--tt-x) !important;
+    top: var(--tt-y) !important;
+    transform: translate(var(--_tx), var(--_ty)) !important;
+    z-index: 9999;
+  }
+
+  .tooltip::after {
+    position: fixed !important;
+    inset: unset !important;
+    left: var(--tt-x) !important;
+    top: var(--tt-y) !important;
+    transform: translate(var(--_atx), var(--_aty)) rotate(var(--_arrow-rot)) !important;
+    z-index: 9999;
+  }
+}
