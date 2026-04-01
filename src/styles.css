@@ -2,24 +2,91 @@
 @plugin "daisyui";
 
 /*
- * Tooltip overflow fix — overrides DaisyUI .tooltip so it escapes overflow-hidden.
+ * ============================================================================
+ * TOOLTIP OVERFLOW FIX
+ * ============================================================================
  *
- * Direction config is defined once via custom properties on .tooltip / .tooltip-*.
- * Both @supports branches consume the same variables — no per-direction duplication.
+ * Overrides DaisyUI's .tooltip component so tooltip content escapes
+ * `overflow: hidden` containers.
  *
- * Modern browsers (CSS Anchor Positioning): pure CSS, no JS.
- * Fallback (Safari / older Firefox):        directive sets --tt-x / --tt-y.
+ * HOW IT WORKS:
+ *   DaisyUI tooltips use `position: absolute` — clipped by any overflow
+ *   ancestor. This override switches them to `position: fixed` (viewport-
+ *   relative), which ignores overflow entirely. The challenge is keeping the
+ *   tooltip anchored to the trigger button. Two strategies handle this:
+ *
+ *   1. CSS Anchor Positioning (Chrome/Edge 125+):
+ *      The trigger declares `anchor-name: --tt`, and the tooltip content
+ *      uses `position-anchor: --tt` + `position-area` to stay attached.
+ *      Pure CSS — no JavaScript involved.
+ *
+ *   2. JS fallback (Safari / Firefox — see tooltip-fixed.ts):
+ *      A script reads the trigger's viewport coordinates via
+ *      getBoundingClientRect() and writes them as --tt-x / --tt-y custom
+ *      properties. The CSS here consumes those for `left` / `top` placement.
+ *
+ *   `@supports (anchor-name: --tt)` gates which strategy is active.
+ *   Both branches produce the same visual result.
+ *
+ * ARCHITECTURE:
+ *   Direction-specific values (position-area, margins, transforms) are stored
+ *   as CSS custom properties on .tooltip / .tooltip-{bottom,left,right}.
+ *   The two @supports blocks are written once — they just read the variables.
+ *   Adding a new direction variant only requires defining its custom props.
+ *
+ * DAISY UI INTEGRATION:
+ *   All DaisyUI features are preserved: color variants (tooltip-primary etc.),
+ *   hover/focus-visible triggers, opacity transitions, the slide-in animation
+ *   via --tt-pos, and the arrow (::after pseudo-element).
+ *
+ * FILES:
+ *   - src/styles.css       — this file (CSS overrides)
+ *   - src/tooltip-fixed.ts — JS fallback (imported in main.ts as side-effect)
+ * ============================================================================
  */
 
-/* ── Direction config (shared by both branches) ── */
+/*
+ * ── Direction config ──
+ *
+ * Custom properties that vary per direction. Both @supports branches
+ * consume these, so each direction is defined in one place only.
+ *
+ * Variables explained:
+ *
+ *   --_area       Position-area for CSS Anchor Positioning. Defines which
+ *                 region of the 3×3 grid around the anchor the tooltip
+ *                 occupies (e.g. "block-start center" = above, centered).
+ *
+ *   --_gap        Margin shorthand (top right bottom left) for tooltip content
+ *                 in the anchor-positioning path. Creates the visual gap
+ *                 between trigger and tooltip. Matches DaisyUI's --tt-off
+ *                 value of 0.5rem.
+ *
+ *   --_arrow-gap  Same as --_gap but for the ::after arrow. Uses a tighter
+ *                 offset (0.25rem + 1px) matching DaisyUI's --tt-tail so the
+ *                 arrow sits between the content and the trigger.
+ *
+ *   --_arrow-rot  Rotation for the arrow SVG mask. DaisyUI's arrow SVG points
+ *                 downward by default (toward the trigger for a top tooltip).
+ *                 Other directions rotate it: 180deg bottom, ±90deg sides.
+ *
+ *   --_tx, --_ty  Fallback translate values for tooltip content. These
+ *                 position the content relative to the --tt-x / --tt-y
+ *                 anchor point set by the JS fallback script.
+ *                 Includes DaisyUI's --tt-pos animation offset — the tooltip
+ *                 starts slightly closer to the trigger (--tt-pos defaults to
+ *                 ±0.25rem) then slides to its final position on hover when
+ *                 DaisyUI sets --tt-pos: 0rem.
+ *
+ *   --_atx, --_aty  Same as --_tx / --_ty but for the ::after arrow.
+ *                   Uses a smaller gap offset to sit between content and trigger.
+ */
 
 .tooltip {
-  /* anchor positioning */
   --_area: block-start center;
   --_gap: 0 0 0.5rem 0;
   --_arrow-gap: 0 0 calc(0.25rem + 1px) 0;
   --_arrow-rot: 0deg;
-  /* fallback transforms */
   --_tx: -50%;
   --_ty: calc(-100% - 0.5rem + var(--tt-pos, 0.25rem));
   --_atx: -50%;
@@ -57,7 +124,34 @@
   --_aty: -50%;
 }
 
-/* ── Modern: CSS Anchor Positioning ── */
+/*
+ * ── Modern: CSS Anchor Positioning (Chrome / Edge 125+) ──
+ *
+ * How anchor positioning works here:
+ *
+ *   1. `anchor-scope: --tt` on .tooltip scopes the anchor name to the
+ *      subtree — multiple tooltips on the page each use --tt without
+ *      colliding.
+ *
+ *   2. The trigger (last child) declares `anchor-name: --tt`, making it
+ *      the reference point.
+ *
+ *   3. Tooltip content becomes `position: fixed` (escapes overflow) with
+ *      `position-anchor: --tt` (stays tied to the trigger). The browser
+ *      handles repositioning on scroll/resize automatically.
+ *
+ *   4. `position-area: var(--_area)` places the element in the correct
+ *      region of the anchor's 3×3 grid (above, below, left, or right).
+ *
+ *   5. `margin` creates the visual gap between trigger and tooltip.
+ *
+ *   6. `transform: none` on content overrides DaisyUI's translateX/Y
+ *      positioning (no longer needed — anchor positioning handles it).
+ *      The arrow keeps `rotate()` for its directional orientation.
+ *
+ *   7. `inset: unset` clears DaisyUI's absolute positioning offsets
+ *      (top/right/bottom/left) which would conflict with anchor placement.
+ */
 
 @supports (anchor-name: --tt) {
   .tooltip {
@@ -68,6 +162,10 @@
     anchor-name: --tt;
   }
 
+  /*
+   * Tooltip content — both the .tooltip-content element and the
+   * ::before pseudo-element (used by DaisyUI's data-tip attribute).
+   */
   .tooltip > .tooltip-content,
   .tooltip[data-tip]::before {
     position: fixed !important;
@@ -79,6 +177,7 @@
     z-index: 9999;
   }
 
+  /* Arrow (::after pseudo-element with an SVG mask). */
   .tooltip::after {
     position: fixed !important;
     position-anchor: --tt;
@@ -90,7 +189,26 @@
   }
 }
 
-/* ── Fallback: positioned via JS custom properties ── */
+/*
+ * ── Fallback: positioned via JS custom properties (Safari / Firefox) ──
+ *
+ * The tooltip-fixed.ts script sets two custom properties on the .tooltip host:
+ *   --tt-x: horizontal anchor point in viewport pixels
+ *   --tt-y: vertical anchor point in viewport pixels
+ *
+ * These are the trigger element's edge midpoints (e.g. for a top tooltip,
+ * --tt-x is the horizontal center and --tt-y is the top edge).
+ *
+ * `left: var(--tt-x)` and `top: var(--tt-y)` place the content at the
+ * anchor point, then `translate(var(--_tx), var(--_ty))` shifts it into
+ * its final position (centering, offsetting by own height, adding gap).
+ *
+ * The --_tx/--_ty values include DaisyUI's `var(--tt-pos)` animation
+ * variable. Since custom properties resolve var() references lazily at
+ * the point of use, --tt-pos is read from .tooltip-content where DaisyUI
+ * sets it — even though --_ty is defined on .tooltip. This preserves the
+ * slide-in hover animation without any extra code.
+ */
 
 @supports not (anchor-name: --tt) {
   .tooltip > .tooltip-content,
