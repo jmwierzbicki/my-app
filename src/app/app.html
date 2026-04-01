@@ -1,24 +1,206 @@
-<div class=" min-h-screen flex items-center justify-center">
-  <div class="overflow-hidden">
-    <div class="tooltip tooltip-bottom">
-      <div class="tooltip-content">
-        <div class="animate-bounce text-orange-400 -rotate-10 text-2xl font-black">Woww!</div>
+<div class="min-h-screen p-8 space-y-12">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- 1. ALL FOUR DIRECTIONS inside overflow-hidden          -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">Directions (overflow-hidden parent)</h2>
+    <div class="flex flex-wrap gap-8 justify-center">
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip" data-tip="Top tooltip">
+          <button class="btn">Top (default)</button>
+        </div>
       </div>
-      <button class="btn">Hover me</button>
-    </div>
-  </div>
 
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-bottom" data-tip="Bottom tooltip">
+          <button class="btn">Bottom</button>
+        </div>
+      </div>
 
-  <div class="overflow-hidden">
-    <div class="tooltip tooltip-top" data-tip="hello">
-      <button class="btn">Hover me</button>
-    </div>
-  </div>
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-left" data-tip="Left tooltip">
+          <button class="btn">Left</button>
+        </div>
+      </div>
 
-    <div class="overflow-hidden">
-    <div class="tooltip tooltip-left" data-tip="hello">
-      <button class="btn">Hover me</button>
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-right" data-tip="Right tooltip">
+          <button class="btn">Right</button>
+        </div>
+      </div>
+
     </div>
-  </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- 2. RICH CONTENT via .tooltip-content                   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">Rich tooltip content (overflow-hidden parent)</h2>
+    <div class="flex flex-wrap gap-8 justify-center">
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip">
+          <div class="tooltip-content">
+            <div class="animate-bounce text-orange-400 -rotate-10 text-2xl font-black">Woww!</div>
+          </div>
+          <button class="btn">Animated</button>
+        </div>
+      </div>
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-bottom">
+          <div class="tooltip-content">
+            <p class="font-semibold">Multi-line</p>
+            <p class="text-xs opacity-70">With a second line of text</p>
+          </div>
+          <button class="btn">Multi-line</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- 3. COLOR VARIANTS                                      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">Color variants (overflow-hidden parent)</h2>
+    <div class="flex flex-wrap gap-8 justify-center">
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-primary" data-tip="Primary">
+          <button class="btn btn-primary">Primary</button>
+        </div>
+      </div>
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-secondary" data-tip="Secondary">
+          <button class="btn btn-secondary">Secondary</button>
+        </div>
+      </div>
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-accent" data-tip="Accent">
+          <button class="btn btn-accent">Accent</button>
+        </div>
+      </div>
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-error tooltip-bottom" data-tip="Error + bottom">
+          <button class="btn btn-error">Error bottom</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- 4. FOCUS-VISIBLE (tab into these)                      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">Focus-visible (tab into these)</h2>
+    <div class="flex flex-wrap gap-8 justify-center">
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip" data-tip="Focused!">
+          <button class="btn">Tab to me</button>
+        </div>
+      </div>
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-right" data-tip="Focused right!">
+          <button class="btn">Tab to me</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- 5. TOOLTIP-OPEN (always visible, no hover needed)      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">Always open (.tooltip-open)</h2>
+    <div class="flex flex-wrap gap-8 justify-center">
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-open" data-tip="Always visible">
+          <button class="btn">Open top</button>
+        </div>
+      </div>
+
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="tooltip tooltip-open tooltip-bottom tooltip-warning" data-tip="Always visible bottom">
+          <button class="btn btn-warning">Open bottom</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- 6. SCROLLABLE CONTAINER (position updates on scroll)   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">Inside scrollable container</h2>
+    <div class="h-48 overflow-auto border border-dashed border-base-300 rounded-lg p-6">
+      <div class="h-96 flex flex-col items-center justify-between py-8">
+        <p class="text-sm opacity-50">Scroll down</p>
+
+        <div class="overflow-hidden rounded-lg p-4">
+          <div class="tooltip tooltip-right" data-tip="Scroll and hover!">
+            <button class="btn">Scroll test</button>
+          </div>
+        </div>
+
+        <p class="text-sm opacity-50">Scroll up</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- 7. MULTIPLE TOOLTIPS in one overflow container         -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">Multiple in one overflow-hidden container</h2>
+    <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6 flex gap-4 justify-center">
+
+      <div class="tooltip" data-tip="First">
+        <button class="btn btn-sm">One</button>
+      </div>
+
+      <div class="tooltip tooltip-bottom" data-tip="Second">
+        <button class="btn btn-sm">Two</button>
+      </div>
+
+      <div class="tooltip tooltip-left" data-tip="Third">
+        <button class="btn btn-sm">Three</button>
+      </div>
+
+      <div class="tooltip tooltip-right" data-tip="Fourth">
+        <button class="btn btn-sm">Four</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- 8. DEEPLY NESTED overflow containers                   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section>
+    <h2 class="text-lg font-bold mb-4">Deeply nested overflow containers</h2>
+    <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+      <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+        <div class="overflow-hidden border border-dashed border-base-300 rounded-lg p-6">
+          <div class="tooltip tooltip-success" data-tip="3 levels deep!">
+            <button class="btn btn-success">Nested</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
 </div>
